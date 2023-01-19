@@ -1,6 +1,5 @@
 const express = require("express");
 const app = express();
-const PORT = 3000;
 
 app.get("/", function (req, res) {
   res.send("Welcome to the Beyoncé albums!");
@@ -54,25 +53,42 @@ app.get("/albums/:albumId", function (req, res) {
 // 3.4) Add a New Album
 
 app.use(express.json());
-
+let idCount = 13;
 app.post("/albums", function (req, res) {
-  const newAlbum = req.body;
+  const newAlbum = {
+    albumId: String(idCount++),
+    artistName: req.body.artistName,
+    collectionName: req.body.collectionName,
+    artworkUrl100: req.body.artworkUrl,
+    releaseDate: req.body.releaseDate,
+    primaryGenreName: req.body.primaryGenreName,
+    url: req.body.url,
+  };
   albumsData.push(newAlbum);
   res.status(201).send({ newAlbum });
+});
+
+// 2.2 Workshop: Updating Data
+app.put("/albums/:albumId", function (req, res) {
+  const newAlbum = { ...req.params, ...req.body };
+  const albumIndex = albumsData.findIndex(
+    (album) => album.albumId === req.params.albumId
+  );
+
+  albumsData.splice(albumIndex, 1, newAlbum);
+  res.status(200).send({ success: true });
 });
 
 // 3.5) Delete an album
 app.delete("/albums/:albumId", function (req, res) {
   const idToDel = req.params.albumId;
-  const indexToDel = albumsData.findIndex(
-    (album) => album.albumId === idToDel
-  );
-  if (indexToDel >= 0){
-    albumsData.splice(indexToDel, 1)
+  const indexToDel = albumsData.findIndex((album) => album.albumId === idToDel);
+  if (indexToDel >= 0) {
+    albumsData.splice(indexToDel, 1);
   }
   res.status(200).send({ albumsData });
 });
 
-app.listen(PORT, function (req, res) {
-  console.log("Server is running on port 3000...");
+app.listen(3001, function (req, res) {
+  console.log("Server is running on port 3001...");
 });
